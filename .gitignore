@@ -1,0 +1,14 @@
+# Dataset
+backend/dataset/
+
+# Cache e file temporanei
+**/__pycache__/
+
+# Dipendenze
+node_modules/
+
+# Configurazioni temporanee
+.env
+
+# Editor files
+.vscode/
