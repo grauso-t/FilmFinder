@@ -9,7 +9,7 @@ from datetime import datetime
 class MovieService:
     def __init__(self):
         self.db = Database()
-        self.collection = self.db.get_collection()
+        self.collection = self.db.get_collection("movie")
         self.schema = MovieSchema()
         self._create_indexes()
     
@@ -42,16 +42,51 @@ class MovieService:
             return {'success': False, 'error': str(e)}
     
     def get_movie_by_id(self, movie_id: str) -> Dict:
-        """Recupera un film per ID"""
         try:
-            movie = self.collection.find_one({'_id': movie_id})
+            pipeline = [
+                {
+                    '$match': {'_id': movie_id}
+                },
+                {
+                    '$lookup': {
+                        'from': 'credits',
+                        'localField': '_id',
+                        'foreignField': 'film_id',
+                        'as': 'credits'
+                    }
+                }
+            ]
             
-            if movie:
-                movie['id'] = str(movie['_id'])
-                del movie['_id']
-                return {'success': True, 'data': movie}
-            else:
+            print(f"movie_id: {movie_id}")
+            result = list(self.collection.aggregate(pipeline))
+            
+            if not result:
                 return {'success': False, 'error': 'Film non trovato'}
+            
+            movie = result[0]
+            movie['id'] = str(movie['_id'])
+            del movie['_id']
+            
+            # Separa credits in attori e registi
+            movie['actors'] = []
+            movie['directors'] = []
+            
+            for credit in movie['credits']:
+                credit_data = {
+                    'id': str(credit['_id']),
+                    'name': credit['name'],
+                    'character': credit.get('character', ''),
+                    'role': credit['role']
+                }
+                if credit['role'] == 'ACTOR':
+                    movie['actors'].append(credit_data)
+                elif credit['role'] == 'DIRECTOR':
+                    movie['directors'].append(credit_data)
+            
+            del movie['credits']
+            
+            return {'success': True, 'data': movie}
+            
         except Exception as e:
             return {'success': False, 'error': str(e)}
     

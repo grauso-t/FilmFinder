@@ -1,32 +1,25 @@
 import React, { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 
-const FilmDetail = () => {
+const FilmDetails = () => {
+  const navigate = useNavigate();
+  
+  // FIX: Destructure the filmId from useParams properly
   const { filmId } = useParams();
   const [film, setFilm] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [imageError, setImageError] = useState(false);
 
-  // --- ICONS ---
-  const SearchIcon = () => (
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-      <circle cx="11" cy="11" r="8"></circle>
-      <path d="m21 21-4.35-4.35"></path>
-    </svg>
-  );
+  const handleBackToHome = () => {
+    navigate('/');
+  };
 
-  const UserIcon = () => (
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-      <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-      <circle cx="12" cy="7" r="4"></circle>
-    </svg>
-  );
-
-  const FilmIcon = () => (
+  // Icons
+  const ArrowLeftIcon = () => (
     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-      <rect width="18" height="18" x="3" y="3" rx="2"></rect>
-      <path d="M7 3v18"></path><path d="M3 7.5h4"></path><path d="M3 12h18"></path><path d="M3 16.5h4"></path>
-      <path d="M17 3v18"></path><path d="M17 7.5h4"></path><path d="M17 16.5h4"></path>
+      <path d="m12 19-7-7 7-7"/>
+      <path d="m19 12H5"/>
     </svg>
   );
 
@@ -36,16 +29,11 @@ const FilmDetail = () => {
     </svg>
   );
 
-  const ArrowLeftIcon = () => (
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-      <path d="m15 18-6-6 6-6"></path>
-    </svg>
-  );
-
   const CalendarIcon = () => (
     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
       <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
-      <line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line>
+      <line x1="16" y1="2" x2="16" y2="6"></line>
+      <line x1="8" y1="2" x2="8" y2="6"></line>
       <line x1="3" y1="10" x2="21" y2="10"></line>
     </svg>
   );
@@ -57,35 +45,30 @@ const FilmDetail = () => {
     </svg>
   );
 
-  const GlobeIcon = () => (
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-      <circle cx="12" cy="12" r="10"></circle>
-      <line x1="2" y1="12" x2="22" y2="12"></line>
-      <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
+  const PlayIcon = () => (
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+      <polygon points="5,3 19,12 5,21"></polygon>
     </svg>
   );
 
-  const TagIcon = () => (
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-      <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path>
-      <line x1="7" y1="7" x2="7.01" y2="7"></line>
+  const FilmIcon = () => (
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+      <rect width="18" height="18" x="3" y="3" rx="2"></rect>
+      <path d="M7 3v18"></path>
+      <path d="M3 7.5h4"></path>
+      <path d="M3 12h18"></path>
+      <path d="M3 16.5h4"></path>
+      <path d="M17 3v18"></path>
+      <path d="M17 7.5h4"></path>
+      <path d="M17 16.5h4"></path>
     </svg>
   );
 
-  const ExternalLinkIcon = () => (
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-      <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
-      <polyline points="15,3 21,3 21,9"></polyline>
-      <line x1="10" y1="14" x2="21" y2="3"></line>
-    </svg>
-  );
-
-  const UsersIcon = () => (
+  const TvIcon = () => (
     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-      <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path>
-      <circle cx="9" cy="7" r="4"></circle>
-      <path d="M22 21v-2a4 4 0 0 0-3-3.87"></path>
-      <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+      <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
+      <line x1="8" y1="21" x2="16" y2="21"></line>
+      <line x1="12" y1="17" x2="12" y2="21"></line>
     </svg>
   );
 
@@ -115,40 +98,44 @@ const FilmDetail = () => {
     }
   }, [filmId]);
 
-  // Helper functions
   const parseGenres = (genresString) => {
-    if (!genresString || genresString === "No Data" || genresString === "[]") return [];
     try {
       return JSON.parse(genresString.replace(/'/g, '"'));
     } catch {
-      return genresString.split(',').map(g => g.trim());
+      return [];
     }
   };
 
   const parseCountries = (countriesString) => {
-    if (!countriesString || countriesString === "No Data" || countriesString === "[]") return [];
     try {
       return JSON.parse(countriesString.replace(/'/g, '"'));
     } catch {
-      return countriesString.split(',').map(c => c.trim());
+      return [];
     }
   };
 
   const formatRuntime = (minutes) => {
-    if (!minutes || minutes === "No Data" || minutes === 0) return "N/A";
+    if (!minutes) return 'N/A';
     const hours = Math.floor(minutes / 60);
     const mins = minutes % 60;
     return hours > 0 ? `${hours}h ${mins}m` : `${mins}m`;
   };
 
-  const formatScore = (score) => {
-    if (!score || score === "No Data" || score === 0) return "N/A";
-    return typeof score === 'number' ? score.toFixed(1) : score;
-  };
-
-  const formatVotes = (votes) => {
-    if (!votes || votes === "No Data" || votes === 0) return "N/A";
-    return votes.toLocaleString();
+  const renderStars = (rating) => {
+    const stars = [];
+    const fullStars = Math.floor(rating / 2);
+    const hasHalfStar = (rating / 2) % 1 >= 0.5;
+    
+    for (let i = 0; i < 5; i++) {
+      if (i < fullStars) {
+        stars.push(<StarIcon key={i} filled size={20} />);
+      } else if (i === fullStars && hasHalfStar) {
+        stars.push(<StarIcon key={i} size={20} />);
+      } else {
+        stars.push(<StarIcon key={i} size={20} />);
+      }
+    }
+    return stars;
   };
 
   const styles = {
@@ -174,239 +161,235 @@ const FilmDetail = () => {
       margin: '0 auto',
       padding: '0 1rem',
       display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'space-between'
-    },
-    logoContainer: {
-      display: 'flex',
       alignItems: 'center'
-    },
-    logoIcon: {
-      width: '40px',
-      height: '40px',
-      background: 'linear-gradient(135deg, #dc2626, #991b1b)',
-      borderRadius: '8px',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      boxShadow: '0 4px 6px rgba(0, 0, 0, 0.3)',
-      position: 'relative'
-    },
-    logoAccent: {
-      position: 'absolute',
-      top: '-4px',
-      right: '-4px',
-      width: '16px',
-      height: '16px',
-      backgroundColor: '#fbbf24',
-      borderRadius: '50%',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center'
-    },
-    logoAccentDot: {
-      width: '8px',
-      height: '8px',
-      backgroundColor: '#111827',
-      borderRadius: '50%'
-    },
-    logoText: {
-      marginLeft: '12px',
-      fontSize: '24px',
-      fontWeight: 'bold',
-      background: 'linear-gradient(135deg, #ef4444, #dc2626)',
-      WebkitBackgroundClip: 'text',
-      WebkitTextFillColor: 'transparent',
-      backgroundClip: 'text'
     },
     backButton: {
       display: 'flex',
       alignItems: 'center',
       gap: '8px',
-      background: 'linear-gradient(135deg, #374151, #4b5563)',
+      backgroundColor: 'transparent',
+      border: 'none',
       color: '#ffffff',
-      border: 'none',
-      borderRadius: '8px',
+      fontSize: '16px',
+      cursor: 'pointer',
       padding: '8px 16px',
-      cursor: 'pointer',
-      transition: 'all 0.3s ease',
-      fontSize: '14px'
+      borderRadius: '8px',
+      transition: 'all 0.3s ease'
     },
-    userButton: {
-      width: '40px',
-      height: '40px',
-      background: 'linear-gradient(135deg, #4b5563, #374151)',
-      borderRadius: '50%',
-      border: 'none',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      cursor: 'pointer',
-      boxShadow: '0 4px 6px rgba(0, 0, 0, 0.3)',
-      transition: 'all 0.3s ease',
-      color: '#ffffff'
-    },
-    main: {
+    heroSection: {
       marginTop: '80px',
-      maxWidth: '1200px',
-      margin: '80px auto 0',
-      padding: '2rem 1rem'
+      position: 'relative',
+      height: '70vh',
+      display: 'flex',
+      alignItems: 'flex-end',
+      overflow: 'hidden'
     },
-    filmHero: {
-      display: 'grid',
-      gridTemplateColumns: '300px 1fr',
+    heroBackground: {
+      position: 'absolute',
+      top: 0,
+      left: 0,
+      right: 0,
+      bottom: 0,
+      backgroundSize: 'cover',
+      backgroundPosition: 'center',
+      filter: 'blur(8px) brightness(0.3)',
+      transform: 'scale(1.1)'
+    },
+    heroOverlay: {
+      position: 'absolute',
+      top: 0,
+      left: 0,
+      right: 0,
+      bottom: 0,
+      background: 'linear-gradient(transparent 0%, rgba(17, 24, 39, 0.8) 70%, #111827 100%)'
+    },
+    heroContent: {
+      position: 'relative',
+      zIndex: 10,
+      maxWidth: '1200px',
+      margin: '0 auto',
+      width: '100%',
+      padding: '0 1rem 3rem',
+      display: 'flex',
       gap: '2rem',
-      marginBottom: '3rem',
-      '@media (max-width: 768px)': {
-        gridTemplateColumns: '1fr',
-        textAlign: 'center'
-      }
+      alignItems: 'flex-end'
     },
     posterContainer: {
+      flexShrink: 0,
       position: 'relative'
     },
     poster: {
-      width: '100%',
+      width: '300px',
       height: '450px',
       borderRadius: '12px',
-      boxShadow: '0 8px 25px rgba(0, 0, 0, 0.4)',
-      overflow: 'hidden',
-      backgroundColor: '#374151'
-    },
-    posterImg: {
-      width: '100%',
-      height: '100%',
-      objectFit: 'cover'
+      boxShadow: '0 20px 40px rgba(0, 0, 0, 0.5)',
+      objectFit: 'cover',
+      border: '2px solid #374151'
     },
     posterPlaceholder: {
-      width: '100%',
-      height: '100%',
+      width: '300px',
+      height: '450px',
+      backgroundColor: '#374151',
+      borderRadius: '12px',
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'center',
       color: '#9ca3af',
-      fontSize: '18px'
+      fontSize: '18px',
+      boxShadow: '0 20px 40px rgba(0, 0, 0, 0.5)',
+      border: '2px solid #374151'
     },
     filmInfo: {
-      display: 'flex',
-      flexDirection: 'column',
-      justifyContent: 'center'
+      flex: 1,
+      paddingBottom: '1rem'
     },
     filmTitle: {
-      fontSize: '2.5rem',
+      fontSize: '3rem',
       fontWeight: 'bold',
       marginBottom: '1rem',
-      lineHeight: '1.2'
+      lineHeight: '1.1',
+      textShadow: '2px 2px 4px rgba(0, 0, 0, 0.8)'
     },
-    filmTagline: {
-      fontSize: '1.2rem',
-      color: '#9ca3af',
-      marginBottom: '1.5rem',
-      fontStyle: 'italic'
-    },
-    ratingSection: {
+    filmMeta: {
       display: 'flex',
       alignItems: 'center',
-      gap: '2rem',
+      gap: '1.5rem',
       marginBottom: '1.5rem',
       flexWrap: 'wrap'
     },
-    ratingBox: {
+    metaItem: {
       display: 'flex',
       alignItems: 'center',
-      gap: '8px',
-      background: 'linear-gradient(135deg, rgba(239, 68, 68, 0.1), rgba(220, 38, 38, 0.1))',
-      padding: '8px 16px',
-      borderRadius: '8px',
-      border: '1px solid #374151'
-    },
-    ratingScore: {
-      fontSize: '18px',
-      fontWeight: 'bold'
-    },
-    ratingLabel: {
-      fontSize: '12px',
-      color: '#9ca3af',
-      textTransform: 'uppercase'
-    },
-    quickInfo: {
-      display: 'grid',
-      gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))',
-      gap: '1rem',
-      marginBottom: '2rem'
-    },
-    infoItem: {
-      display: 'flex',
-      alignItems: 'center',
-      gap: '8px',
-      color: '#d1d5db'
-    },
-    genresContainer: {
-      display: 'flex',
-      flexWrap: 'wrap',
-      gap: '8px',
-      marginBottom: '2rem'
-    },
-    genreBadge: {
-      background: 'linear-gradient(135deg, #374151, #4b5563)',
-      color: '#ffffff',
-      padding: '4px 12px',
-      borderRadius: '16px',
-      fontSize: '14px',
-      border: '1px solid #6b7280'
-    },
-    description: {
-      fontSize: '16px',
-      lineHeight: '1.6',
+      gap: '6px',
       color: '#d1d5db',
-      marginBottom: '2rem'
+      fontSize: '16px'
     },
-    detailsGrid: {
-      display: 'grid',
-      gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
-      gap: '1.5rem',
-      marginBottom: '2rem'
+    ratingContainer: {
+      display: 'flex',
+      alignItems: 'center',
+      gap: '12px',
+      marginBottom: '1.5rem'
     },
-    detailCard: {
-      background: 'linear-gradient(135deg, rgba(55, 65, 81, 0.5), rgba(75, 85, 99, 0.5))',
-      borderRadius: '12px',
-      padding: '1.5rem',
-      border: '1px solid #374151'
+    ratingStars: {
+      display: 'flex',
+      gap: '2px'
     },
-    detailTitle: {
+    ratingText: {
       fontSize: '18px',
       fontWeight: 'bold',
-      marginBottom: '1rem',
+      color: '#fbbf24'
+    },
+    genres: {
       display: 'flex',
-      alignItems: 'center',
-      gap: '8px'
+      gap: '8px',
+      marginBottom: '1.5rem',
+      flexWrap: 'wrap'
     },
-    detailContent: {
-      color: '#d1d5db'
+    genreTag: {
+      backgroundColor: 'rgba(239, 68, 68, 0.2)',
+      color: '#ef4444',
+      padding: '6px 12px',
+      borderRadius: '20px',
+      fontSize: '14px',
+      fontWeight: '500',
+      border: '1px solid rgba(239, 68, 68, 0.3)'
     },
-    externalLinks: {
+    description: {
+      fontSize: '18px',
+      lineHeight: '1.6',
+      color: '#d1d5db',
+      maxWidth: '800px',
+      textShadow: '1px 1px 2px rgba(0, 0, 0, 0.8)'
+    },
+    actionButtons: {
       display: 'flex',
       gap: '1rem',
       marginTop: '2rem'
     },
-    linkButton: {
+    playButton: {
+      backgroundColor: '#ef4444',
+      color: '#ffffff',
+      border: 'none',
+      padding: '12px 24px',
+      borderRadius: '8px',
+      fontSize: '16px',
+      fontWeight: 'bold',
+      cursor: 'pointer',
       display: 'flex',
       alignItems: 'center',
       gap: '8px',
-      background: 'linear-gradient(135deg, #dc2626, #991b1b)',
-      color: '#ffffff',
-      textDecoration: 'none',
-      padding: '12px 20px',
-      borderRadius: '8px',
       transition: 'all 0.3s ease',
-      fontSize: '14px',
-      fontWeight: '500'
+      boxShadow: '0 4px 12px rgba(239, 68, 68, 0.3)'
+    },
+    detailsSection: {
+      maxWidth: '1200px',
+      margin: '0 auto',
+      padding: '3rem 1rem'
+    },
+    detailsGrid: {
+      display: 'grid',
+      gridTemplateColumns: '2fr 1fr',
+      gap: '3rem',
+      marginBottom: '3rem'
+    },
+    castSection: {
+      backgroundColor: '#1f2937',
+      borderRadius: '12px',
+      padding: '2rem',
+      border: '1px solid #374151'
+    },
+    sectionTitle: {
+      fontSize: '24px',
+      fontWeight: 'bold',
+      marginBottom: '1.5rem',
+      color: '#ffffff'
+    },
+    castGrid: {
+      display: 'grid',
+      gap: '1rem'
+    },
+    castMember: {
+      display: 'flex',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      padding: '12px 0',
+      borderBottom: '1px solid #374151'
+    },
+    actorName: {
+      fontWeight: '600',
+      color: '#ffffff'
+    },
+    characterName: {
+      color: '#9ca3af',
+      fontSize: '14px'
+    },
+    infoSection: {
+      backgroundColor: '#1f2937',
+      borderRadius: '12px',
+      padding: '2rem',
+      border: '1px solid #374151'
+    },
+    infoItem: {
+      display: 'flex',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      padding: '12px 0',
+      borderBottom: '1px solid #374151'
+    },
+    infoLabel: {
+      color: '#9ca3af',
+      fontSize: '14px'
+    },
+    infoValue: {
+      color: '#ffffff',
+      fontWeight: '500',
+      textAlign: 'right'
     },
     loadingContainer: {
       display: 'flex',
       justifyContent: 'center',
       alignItems: 'center',
-      height: '50vh',
+      height: '100vh',
       fontSize: '18px',
       color: '#9ca3af'
     },
@@ -415,34 +398,19 @@ const FilmDetail = () => {
       flexDirection: 'column',
       justifyContent: 'center',
       alignItems: 'center',
-      height: '50vh',
+      height: '100vh',
       fontSize: '18px',
       color: '#ef4444',
-      textAlign: 'center'
+      textAlign: 'center',
+      gap: '1rem'
     }
   };
 
   if (loading) {
     return (
       <div style={styles.container}>
-        <header style={styles.header}>
-          <div style={styles.headerContent}>
-            <div style={styles.logoContainer}>
-              <div style={styles.logoIcon}>
-                <FilmIcon />
-                <div style={styles.logoAccent}>
-                  <div style={styles.logoAccentDot}></div>
-                </div>
-              </div>
-              <span style={styles.logoText}>FilmFinder</span>
-            </div>
-            <button style={styles.userButton}>
-              <UserIcon />
-            </button>
-          </div>
-        </header>
         <div style={styles.loadingContainer}>
-          Caricamento dettagli film...
+          Caricamento dettagli...
         </div>
       </div>
     );
@@ -451,26 +419,16 @@ const FilmDetail = () => {
   if (error) {
     return (
       <div style={styles.container}>
-        <header style={styles.header}>
-          <div style={styles.headerContent}>
-            <div style={styles.logoContainer}>
-              <div style={styles.logoIcon}>
-                <FilmIcon />
-                <div style={styles.logoAccent}>
-                  <div style={styles.logoAccentDot}></div>
-                </div>
-              </div>
-              <span style={styles.logoText}>FilmFinder</span>
-            </div>  
-            <button style={styles.userButton}>
-              <UserIcon />
-            </button>
-          </div>
-        </header>
         <div style={styles.errorContainer}>
-          <h2>Errore nel caricamento del film</h2>
+          <h2>Errore nel caricamento</h2>
           <p>{error}</p>
-          <p>Film ID: {filmId}</p>
+          <button 
+            style={styles.playButton}
+            onClick={handleBackToHome}
+          >
+            <ArrowLeftIcon />
+            Torna indietro
+          </button>
         </div>
       </div>
     );
@@ -480,211 +438,240 @@ const FilmDetail = () => {
     return (
       <div style={styles.container}>
         <div style={styles.errorContainer}>
-          Film non trovato
+          <h2>Film non trovato</h2>
+          <button 
+            style={styles.playButton}
+            onClick={handleBackToHome}
+          >
+            <ArrowLeftIcon />
+            Torna indietro
+          </button>
         </div>
       </div>
     );
   }
 
-  const genres = parseGenres(film.genres);
-  const countries = parseCountries(film.production_countries);
+  const genres = parseGenres(film.genres || '[]');
+  const countries = parseCountries(film.production_countries || '[]');
 
   return (
     <div style={styles.container}>
       {/* Header */}
       <header style={styles.header}>
         <div style={styles.headerContent}>
-          <div style={styles.logoContainer}>
-            <div style={styles.logoIcon}>
-              <FilmIcon />
-              <div style={styles.logoAccent}>
-                <div style={styles.logoAccentDot}></div>
-              </div>
-            </div>
-            <span style={styles.logoText}>FilmFinder</span>
-          </div>
-          <button style={styles.userButton}>
-            <UserIcon />
+          <button 
+            style={styles.backButton}
+            onClick={handleBackToHome}
+            onMouseEnter={(e) => e.target.style.backgroundColor = '#374151'}
+            onMouseLeave={(e) => e.target.style.backgroundColor = 'transparent'}
+          >
+            <ArrowLeftIcon />
+            Torna indietro
           </button>
         </div>
       </header>
 
-      {/* Main Content */}
-      <main style={styles.main}>
-        {/* Film Hero Section */}
-        <div style={styles.filmHero}>
+      {/* Hero Section */}
+      <div style={styles.heroSection}>
+        {film.cover_url && !imageError && (
+          <div 
+            style={{
+              ...styles.heroBackground,
+              backgroundImage: `url(${film.cover_url})`
+            }}
+          />
+        )}
+        <div style={styles.heroOverlay} />
+        
+        <div style={styles.heroContent}>
           <div style={styles.posterContainer}>
-            <div style={styles.poster}>
-              {film.cover_url && film.cover_url !== "No Data" && film.cover_url !== "" ? (
-                <img 
-                  src={film.cover_url}
-                  alt={film.title}
-                  style={styles.posterImg}
-                  onError={(e) => {
-                    e.target.style.display = 'none';
-                    e.target.nextSibling.style.display = 'flex';
-                  }}
-                />
-              ) : null}
-              <div style={{...styles.posterPlaceholder, display: (!film.cover_url || film.cover_url === "No Data" || film.cover_url === "") ? 'flex' : 'none'}}>
+            {film.cover_url && !imageError ? (
+              <img
+                src={film.cover_url}
+                alt={film.title}
+                style={styles.poster}
+                onError={() => setImageError(true)}
+              />
+            ) : (
+              <div style={styles.posterPlaceholder}>
                 <FilmIcon />
               </div>
-            </div>
+            )}
           </div>
 
           <div style={styles.filmInfo}>
-            <h1 style={styles.filmTitle}>{film.title || "Titolo non disponibile"}</h1>
+            <h1 style={styles.filmTitle}>{film.title}</h1>
             
-            {/* Rating Section */}
-            <div style={styles.ratingSection}>
-              {film.imdb_score && film.imdb_score !== "No Data" && (
-                <div style={styles.ratingBox}>
-                  <StarIcon filled size={20} />
-                  <div>
-                    <div style={styles.ratingScore}>{formatScore(film.imdb_score)}</div>
-                    <div style={styles.ratingLabel}>IMDb</div>
-                  </div>
-                </div>
-              )}
-              {film.tmdb_score && film.tmdb_score !== "No Data" && (
-                <div style={styles.ratingBox}>
-                  <StarIcon filled size={20} />
-                  <div>
-                    <div style={styles.ratingScore}>{formatScore(film.tmdb_score)}</div>
-                    <div style={styles.ratingLabel}>TMDb</div>
-                  </div>
-                </div>
-              )}
-            </div>
-
-            {/* Quick Info */}
-            <div style={styles.quickInfo}>
-              {film.release_year && film.release_year !== "No Data" && (
-                <div style={styles.infoItem}>
-                  <CalendarIcon />
-                  <span>{film.release_year}</span>
-                </div>
-              )}
-              {film.runtime && film.runtime !== "No Data" && (
-                <div style={styles.infoItem}>
+            <div style={styles.filmMeta}>
+              <div style={styles.metaItem}>
+                <CalendarIcon />
+                <span>{film.release_year}</span>
+              </div>
+              
+              {film.runtime && (
+                <div style={styles.metaItem}>
                   <ClockIcon />
                   <span>{formatRuntime(film.runtime)}</span>
                 </div>
               )}
-              {film.age_certification && film.age_certification !== "No Data" && film.age_certification !== "" && (
-                <div style={styles.infoItem}>
-                  <TagIcon />
-                  <span>{film.age_certification}</span>
+              
+              {film.type === 'SHOW' && film.seasons && (
+                <div style={styles.metaItem}>
+                  <TvIcon />
+                  <span>{film.seasons} stagioni</span>
+                </div>
+              )}
+              
+              {film.age_certification && (
+                <div style={styles.metaItem}>
+                  <span style={{
+                    backgroundColor: '#ef4444',
+                    color: '#ffffff',
+                    padding: '4px 8px',
+                    borderRadius: '4px',
+                    fontSize: '12px',
+                    fontWeight: 'bold'
+                  }}>
+                    {film.age_certification}
+                  </span>
                 </div>
               )}
             </div>
 
-            {/* Genres */}
+            {film.imdb_score && (
+              <div style={styles.ratingContainer}>
+                <div style={styles.ratingStars}>
+                  {renderStars(film.imdb_score)}
+                </div>
+                <span style={styles.ratingText}>
+                  {film.imdb_score}/10
+                </span>
+                {film.imdb_votes && (
+                  <span style={{ color: '#9ca3af', fontSize: '14px' }}>
+                    ({film.imdb_votes.toLocaleString()} voti)
+                  </span>
+                )}
+              </div>
+            )}
+
             {genres.length > 0 && (
-              <div style={styles.genresContainer}>
+              <div style={styles.genres}>
                 {genres.map((genre, index) => (
-                  <span key={index} style={styles.genreBadge}>
-                    {genre}
+                  <span key={index} style={styles.genreTag}>
+                    {genre.charAt(0).toUpperCase() + genre.slice(1)}
                   </span>
                 ))}
               </div>
             )}
 
-            {/* Description */}
-            {film.description && film.description !== "No Data" && film.description !== "" && (
-              <p style={styles.description}>
-                {film.description}
-              </p>
+            <p style={styles.description}>{film.description}</p>
+
+            <div style={styles.actionButtons}>
+              <button 
+                style={styles.playButton}
+                onMouseEnter={(e) => e.target.style.transform = 'scale(1.05)'}
+                onMouseLeave={(e) => e.target.style.transform = 'scale(1)'}
+              >
+                <PlayIcon />
+                {film.type === 'SHOW' ? 'Guarda Serie' : 'Guarda Film'}
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Details Section */}
+      <div style={styles.detailsSection}>
+        <div style={styles.detailsGrid}>
+          {/* Cast Section */}
+          {film.actors && film.actors.length > 0 && (
+            <div style={styles.castSection}>
+              <h2 style={styles.sectionTitle}>Cast Principale</h2>
+              <div style={styles.castGrid}>
+                {film.actors.slice(0, 8).map((actor, index) => (
+                  <div key={index} style={styles.castMember}>
+                    <div>
+                      <div style={styles.actorName}>{actor.name}</div>
+                      <div style={styles.characterName}>{actor.character}</div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Info Section */}
+          <div style={styles.infoSection}>
+            <h2 style={styles.sectionTitle}>Informazioni</h2>
+            
+            <div style={styles.infoItem}>
+              <span style={styles.infoLabel}>Tipo</span>
+              <span style={styles.infoValue}>
+                {film.type === 'SHOW' ? 'Serie TV' : 'Film'}
+              </span>
+            </div>
+
+            {film.imdb_id && (
+              <div style={styles.infoItem}>
+                <span style={styles.infoLabel}>IMDb ID</span>
+                <span style={styles.infoValue}>{film.imdb_id}</span>
+              </div>
+            )}
+
+            {film.tmdb_score && (
+              <div style={styles.infoItem}>
+                <span style={styles.infoLabel}>TMDb Score</span>
+                <span style={styles.infoValue}>{film.tmdb_score}/10</span>
+              </div>
+            )}
+
+            {film.tmdb_popularity && (
+              <div style={styles.infoItem}>
+                <span style={styles.infoLabel}>Popolarità TMDb</span>
+                <span style={styles.infoValue}>{Math.round(film.tmdb_popularity)}</span>
+              </div>
+            )}
+
+            {countries.length > 0 && (
+              <div style={styles.infoItem}>
+                <span style={styles.infoLabel}>Paesi di Produzione</span>
+                <span style={styles.infoValue}>
+                  {countries.join(', ')}
+                </span>
+              </div>
+            )}
+
+            {film.directors && film.directors.length > 0 && (
+              <div style={styles.infoItem}>
+                <span style={styles.infoLabel}>Regia</span>
+                <span style={styles.infoValue}>
+                  {film.directors.map(d => d.name).join(', ')}
+                </span>
+              </div>
             )}
           </div>
         </div>
-
-        {/* Details Grid */}
-        <div style={styles.detailsGrid}>
-          {/* Production Info */}
-          <div style={styles.detailCard}>
-            <h3 style={styles.detailTitle}>
-              <GlobeIcon />
-              Informazioni di Produzione
-            </h3>
-            <div style={styles.detailContent}>
-              {countries.length > 0 && (
-                <p><strong>Paesi:</strong> {countries.join(', ')}</p>
-              )}
-              <p><strong>Tipo:</strong> {film.type || "N/A"}</p>
-              {film.seasons && film.seasons !== "No Data" && film.seasons !== "" && (
-                <p><strong>Stagioni:</strong> {film.seasons}</p>
-              )}
-            </div>
-          </div>
-
-          {/* Ratings & Stats */}
-          <div style={styles.detailCard}>
-            <h3 style={styles.detailTitle}>
-              <UsersIcon />
-              Valutazioni e Statistiche
-            </h3>
-            <div style={styles.detailContent}>
-              {film.imdb_votes && film.imdb_votes !== "No Data" && (
-                <p><strong>Voti IMDb:</strong> {formatVotes(film.imdb_votes)}</p>
-              )}
-              {film.tmdb_popularity && film.tmdb_popularity !== "No Data" && (
-                <p><strong>Popolarità TMDb:</strong> {film.tmdb_popularity.toFixed(1)}</p>
-              )}
-              {film.imdb_id && film.imdb_id !== "No Data" && film.imdb_id !== "" && (
-                <p><strong>ID IMDb:</strong> {film.imdb_id}</p>
-              )}
-            </div>
-          </div>
-        </div>
-
-        {/* External Links */}
-        {film.imdb_id && film.imdb_id !== "No Data" && film.imdb_id !== "" && (
-          <div style={styles.externalLinks}>
-            <a 
-              href={`https://www.imdb.com/title/${film.imdb_id}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              style={styles.linkButton}
-            >
-              <ExternalLinkIcon />
-              Visualizza su IMDb
-            </a>
-          </div>
-        )}
-      </main>
+      </div>
 
       <style>{`
-        button:hover {
-          transform: scale(1.05);
-          filter: brightness(1.1);
-        }
-        
-        a:hover {
-          transform: scale(1.05);
-          filter: brightness(1.1);
-        }
-        
         @media (max-width: 768px) {
-          .film-hero {
-            grid-template-columns: 1fr !important;
-            text-align: center;
+          .hero-content {
+            flex-direction: column !important;
+            align-items: center !important;
+            text-align: center !important;
           }
           
           .details-grid {
             grid-template-columns: 1fr !important;
           }
           
-          .rating-section {
-            justify-content: center;
+          .film-title {
+            font-size: 2rem !important;
           }
           
-          .quick-info {
-            justify-content: center;
-          }
-          
-          .genres-container {
-            justify-content: center;
+          .poster {
+            width: 250px !important;
+            height: 375px !important;
           }
         }
       `}</style>
@@ -692,4 +679,4 @@ const FilmDetail = () => {
   );
 };
 
-export default FilmDetail;
+export default FilmDetails;
