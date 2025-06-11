@@ -4,6 +4,7 @@ from flask_cors import CORS
 from config import Config
 from database import Database
 from routes.movie_routes import create_movie_routes
+from routes.user_routes import create_user_routes
 
 def create_app():
     app = Flask(__name__)
@@ -18,7 +19,10 @@ def create_app():
     
     # Registrazione delle rotte
     movie_routes = create_movie_routes()
+    user_routes = create_user_routes()
+    
     app.register_blueprint(movie_routes)
+    app.register_blueprint(user_routes)
     
     # Rotta di health check
     @app.route('/api/health')

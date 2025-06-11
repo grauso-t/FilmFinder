@@ -3,8 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 
 const FilmDetails = () => {
   const navigate = useNavigate();
-  
-  // FIX: Destructure the filmId from useParams properly
+  const user = JSON.parse(localStorage.getItem('user'));
   const { filmId } = useParams();
   const [film, setFilm] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -12,8 +11,20 @@ const FilmDetails = () => {
   const [imageError, setImageError] = useState(false);
 
   const handleBackToHome = () => {
-    navigate('/');
+    navigate('/home');
   };
+
+
+  const addToFavorites = async () => {
+
+    if (user) {
+      alert('Aggiunto ai preferiti!');
+    }
+
+    else {
+      alert('Devi essere loggato per aggiungere ai preferiti!');
+    }
+  }
 
   // Icons
   const ArrowLeftIcon = () => (
@@ -571,9 +582,10 @@ const FilmDetails = () => {
                 style={styles.playButton}
                 onMouseEnter={(e) => e.target.style.transform = 'scale(1.05)'}
                 onMouseLeave={(e) => e.target.style.transform = 'scale(1)'}
+                onClick={addToFavorites}
               >
                 <PlayIcon />
-                {film.type === 'SHOW' ? 'Guarda Serie' : 'Guarda Film'}
+                Aggiungi ai preferiti
               </button>
             </div>
           </div>

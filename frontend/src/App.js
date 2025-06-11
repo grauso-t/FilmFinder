@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 
 const FilmFinder = () => {
   const navigate = useNavigate();
-
+  const [user, setUser] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [movies, setMovies] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -103,6 +103,25 @@ const FilmFinder = () => {
     </svg>
   );
   
+  useEffect(() => {
+    // Check if user is logged in
+    const userJSON = localStorage.getItem('user');
+
+    if (!userJSON) {
+      // Redirect to login if not logged in
+      navigate('/login');
+    } else {
+      // Parse user data
+      try {
+        setUser(JSON.parse(userJSON));
+      } catch (err) {
+        console.error('Error parsing user data:', err);
+        localStorage.removeItem('user');
+        navigate('/login');
+      }
+    }
+  }, [navigate]);
+
   // Fetch movies from API
   useEffect(() => {
     const fetchMovies = async () => {
@@ -616,7 +635,10 @@ const FilmFinder = () => {
           </div>
 
           {/* User Profile */}
-          <button style={styles.userButton}>
+          <button
+            style={styles.userButton}
+            onClick={() => user ? navigate('/profile') : navigate('/login')}
+          >
             <UserIcon />
           </button>
         </div>
