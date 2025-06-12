@@ -19,6 +19,8 @@ Una webapp per la gestione e ricerca di contenuti Netflix, progettata per esplor
 
 ## Avvio Rapido
 
+Prima importare i file CSV. Consultate la documentazione per ulteriori dettagli.
+
 ### Backend
 ```bash
 cd backend
