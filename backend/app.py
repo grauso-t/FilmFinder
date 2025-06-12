@@ -1,4 +1,3 @@
-# app.py
 from flask import Flask, jsonify
 from flask_cors import CORS
 from config import Config
@@ -10,21 +9,17 @@ def create_app():
     app = Flask(__name__)
     app.config.from_object(Config)
     
-    # Configurazione CORS
     CORS(app)
     
-    # Connessione al database
     db = Database()
     db.connect()
     
-    # Registrazione delle rotte
     movie_routes = create_movie_routes()
     user_routes = create_user_routes()
     
     app.register_blueprint(movie_routes)
     app.register_blueprint(user_routes)
     
-    # Rotta di health check
     @app.route('/api/health')
     def health_check():
         return jsonify({
@@ -32,7 +27,6 @@ def create_app():
             'message': 'Movie API Server is running'
         }), 200
     
-    # Gestione errori globali
     @app.errorhandler(404)
     def not_found(error):
         return jsonify({'error': 'Endpoint non trovato'}), 404

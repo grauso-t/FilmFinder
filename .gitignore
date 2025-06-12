@@ -1,6 +1,3 @@
-# Dataset
-backend/dataset/
-
 # Cache e file temporanei
 **/__pycache__/
 

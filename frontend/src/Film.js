@@ -3,30 +3,76 @@ import { useParams, useNavigate } from 'react-router-dom';
 
 const FilmDetails = () => {
   const navigate = useNavigate();
-  const user = JSON.parse(localStorage.getItem('user'));
+  const user = localStorage.getItem('user') ? JSON.parse(localStorage.getItem('user')) : null;
   const { filmId } = useParams();
   const [film, setFilm] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [imageError, setImageError] = useState(false);
+  const [isFavorite, setIsFavorite] = useState(false);
 
   const handleBackToHome = () => {
     navigate('/home');
   };
 
-
   const addToFavorites = async () => {
-
-    if (user) {
-      alert('Aggiunto ai preferiti!');
+    if (!user || !user.id) {
+      navigate('/login');
+      return;
     }
 
-    else {
-      alert('Devi essere loggato per aggiungere ai preferiti!');
-    }
-  }
+    try {
+      const response = await fetch(`http://127.0.0.1:5000/api/users/${user.id}/favorites`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ movie_id: filmId })
+      });
 
-  // Icons
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || "Errore nell'aggiunta ai preferiti");
+      }
+      
+      setIsFavorite(true);
+      console.log("Film aggiunto ai preferiti");
+    } catch (error) {
+      console.error("Errore durante l'aggiunta ai preferiti:", error);
+    }
+  };
+  
+  const removeFromFavorites = async () => {
+    if (!user || !user.id) {
+      navigate('/login');
+      return;
+    }
+
+    try {
+      const response = await fetch(`http://127.0.0.1:5000/api/users/${user.id}/favorites/${filmId}`, {
+        method: 'DELETE'
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || "Errore nella rimozione dai preferiti");
+      }
+      
+      setIsFavorite(false);
+      console.log("Film rimosso dai preferiti");
+    } catch (error) {
+      console.error("Errore durante la rimozione dai preferiti:", error);
+    }
+  };
+
+  const handleFavoriteToggle = () => {
+    if (isFavorite) {
+      removeFromFavorites();
+    } else {
+      addToFavorites();
+    }
+  };
+
   const ArrowLeftIcon = () => (
     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
       <path d="m12 19-7-7 7-7"/>
@@ -37,6 +83,12 @@ const FilmDetails = () => {
   const StarIcon = ({ filled = false, size = 16 }) => (
     <svg width={size} height={size} viewBox="0 0 24 24" fill={filled ? "#fbbf24" : "none"} stroke="#fbbf24" strokeWidth="2">
       <polygon points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26"></polygon>
+    </svg>
+  );
+  
+  const HeartIcon = ({ filled = false, size = 24 }) => (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill={filled ? "currentColor" : "none"} stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
     </svg>
   );
 
@@ -55,13 +107,7 @@ const FilmDetails = () => {
       <polyline points="12,6 12,12 16,14"></polyline>
     </svg>
   );
-
-  const PlayIcon = () => (
-    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-      <polygon points="5,3 19,12 5,21"></polygon>
-    </svg>
-  );
-
+  
   const FilmIcon = () => (
     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
       <rect width="18" height="18" x="3" y="3" rx="2"></rect>
@@ -83,31 +129,39 @@ const FilmDetails = () => {
     </svg>
   );
 
-  // Fetch film details
   useEffect(() => {
-    const fetchFilmDetails = async () => {
+    const fetchFilmAndFavoriteStatus = async () => {
+      if (!filmId) return;
+      
+      setLoading(true);
       try {
-        setLoading(true);
-        const response = await fetch(`http://127.0.0.1:5000/api/movies/${filmId}`);
-        
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
+        const filmResponse = await fetch(`http://127.0.0.1:5000/api/movies/${filmId}`);
+        if (!filmResponse.ok) {
+          throw new Error(`HTTP error! status: ${filmResponse.status}`);
         }
-        
-        const data = await response.json();
-        setFilm(data);
+        const filmData = await filmResponse.json();
+        setFilm(filmData);
+
+        if (user && user.id) {
+          const favoriteResponse = await fetch(`http://127.0.0.1:5000/api/users/${user.id}/favorites/${filmId}`);
+          if (favoriteResponse.ok) {
+            const favoriteData = await favoriteResponse.json();
+            setIsFavorite(favoriteData.is_favorite);
+          } else if (favoriteResponse.status !== 404) {
+            throw new Error('Errore nel controllo dei preferiti');
+          }
+        }
       } catch (err) {
         setError(err.message);
-        console.error('Error fetching film details:', err);
+        console.error('Errore durante il fetch dei dati:', err);
       } finally {
         setLoading(false);
       }
     };
 
-    if (filmId) {
-      fetchFilmDetails();
-    }
-  }, [filmId]);
+    fetchFilmAndFavoriteStatus();
+  }, [filmId, user?.id]);
+
 
   const parseGenres = (genresString) => {
     try {
@@ -148,8 +202,7 @@ const FilmDetails = () => {
     }
     return stars;
   };
-
-  const styles = {
+    const styles = {
     container: {
       minHeight: '100vh',
       backgroundColor: '#111827',
@@ -317,7 +370,7 @@ const FilmDetails = () => {
       gap: '1rem',
       marginTop: '2rem'
     },
-    playButton: {
+    favoriteButton: {
       backgroundColor: '#ef4444',
       color: '#ffffff',
       border: 'none',
@@ -331,6 +384,21 @@ const FilmDetails = () => {
       gap: '8px',
       transition: 'all 0.3s ease',
       boxShadow: '0 4px 12px rgba(239, 68, 68, 0.3)'
+    },
+     favoriteButtonRemove: {
+      backgroundColor: '#374151',
+      color: '#ffffff',
+      border: '1px solid #4b5563',
+      padding: '12px 24px',
+      borderRadius: '8px',
+      fontSize: '16px',
+      fontWeight: 'bold',
+      cursor: 'pointer',
+      display: 'flex',
+      alignItems: 'center',
+      gap: '8px',
+      transition: 'all 0.3s ease',
+      boxShadow: '0 4px 12px rgba(0, 0, 0, 0.2)'
     },
     detailsSection: {
       maxWidth: '1200px',
@@ -417,6 +485,7 @@ const FilmDetails = () => {
     }
   };
 
+
   if (loading) {
     return (
       <div style={styles.container}>
@@ -434,7 +503,7 @@ const FilmDetails = () => {
           <h2>Errore nel caricamento</h2>
           <p>{error}</p>
           <button 
-            style={styles.playButton}
+            style={styles.favoriteButton}
             onClick={handleBackToHome}
           >
             <ArrowLeftIcon />
@@ -451,7 +520,7 @@ const FilmDetails = () => {
         <div style={styles.errorContainer}>
           <h2>Film non trovato</h2>
           <button 
-            style={styles.playButton}
+            style={styles.favoriteButton}
             onClick={handleBackToHome}
           >
             <ArrowLeftIcon />
@@ -467,7 +536,6 @@ const FilmDetails = () => {
 
   return (
     <div style={styles.container}>
-      {/* Header */}
       <header style={styles.header}>
         <div style={styles.headerContent}>
           <button 
@@ -482,7 +550,6 @@ const FilmDetails = () => {
         </div>
       </header>
 
-      {/* Hero Section */}
       <div style={styles.heroSection}>
         {film.cover_url && !imageError && (
           <div 
@@ -578,24 +645,24 @@ const FilmDetails = () => {
             <p style={styles.description}>{film.description}</p>
 
             <div style={styles.actionButtons}>
-              <button 
-                style={styles.playButton}
-                onMouseEnter={(e) => e.target.style.transform = 'scale(1.05)'}
-                onMouseLeave={(e) => e.target.style.transform = 'scale(1)'}
-                onClick={addToFavorites}
-              >
-                <PlayIcon />
-                Aggiungi ai preferiti
-              </button>
+              {user && (
+                <button 
+                  style={isFavorite ? styles.favoriteButtonRemove : styles.favoriteButton}
+                  onMouseEnter={(e) => e.target.style.transform = 'scale(1.05)'}
+                  onMouseLeave={(e) => e.target.style.transform = 'scale(1)'}
+                  onClick={handleFavoriteToggle}
+                >
+                  <HeartIcon filled={isFavorite} />
+                  {isFavorite ? 'Rimuovi dai preferiti' : 'Aggiungi ai preferiti'}
+                </button>
+              )}
             </div>
           </div>
         </div>
       </div>
 
-      {/* Details Section */}
       <div style={styles.detailsSection}>
         <div style={styles.detailsGrid}>
-          {/* Cast Section */}
           {film.actors && film.actors.length > 0 && (
             <div style={styles.castSection}>
               <h2 style={styles.sectionTitle}>Cast Principale</h2>
@@ -612,7 +679,6 @@ const FilmDetails = () => {
             </div>
           )}
 
-          {/* Info Section */}
           <div style={styles.infoSection}>
             <h2 style={styles.sectionTitle}>Informazioni</h2>
             

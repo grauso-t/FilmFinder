@@ -1,4 +1,3 @@
-# controllers/movie_controller.py
 from flask import request, jsonify
 from services.movie_service import MovieService
 from marshmallow import ValidationError

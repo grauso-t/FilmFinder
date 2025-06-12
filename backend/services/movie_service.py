@@ -1,4 +1,3 @@
-# services/movie_service.py
 from database import Database
 from models.movie import Movie, MovieSchema
 from bson import ObjectId
@@ -29,11 +28,9 @@ class MovieService:
     def create_movie(self, movie_data: Dict) -> Dict:
         """Crea un nuovo film"""
         try:
-            # Validazione dei dati
             movie_obj = self.schema.load(movie_data)
             movie_dict = movie_obj.to_dict()
             
-            # Inserimento nel database
             result = self.collection.insert_one(movie_dict)
             movie_dict['id'] = str(result.inserted_id)
             
@@ -67,7 +64,6 @@ class MovieService:
             movie['id'] = str(movie['_id'])
             del movie['_id']
             
-            # Separa credits in attori e registi
             movie['actors'] = []
             movie['directors'] = []
             
@@ -96,8 +92,7 @@ class MovieService:
         try:
             skip = (page - 1) * per_page
             query = {}
-            
-            # Applicazione filtri
+
             if filters:
                 if 'type' in filters:
                     query['type'] = filters['type']
@@ -113,16 +108,13 @@ class MovieService:
                         {'description': {'$regex': filters['search'], '$options': 'i'}}
                     ]
             
-            # Conteggio totale
             total = self.collection.count_documents(query)
             
-            # Recupero dei film
             movies = list(self.collection.find(query)
                          .skip(skip)
                          .limit(per_page)
                          .sort('created_at', -1))
             
-            # Conversione ObjectId in string
             for movie in movies:
                 movie['id'] = str(movie['_id'])
                 del movie['_id']
@@ -146,7 +138,6 @@ class MovieService:
             if not ObjectId.is_valid(movie_id):
                 return {'success': False, 'error': 'ID non valido'}
             
-            # Validazione dei dati di aggiornamento
             movie_obj = self.schema.load(update_data, partial=True)
             update_dict = movie_obj.to_dict()
             update_dict['updated_at'] = datetime.utcnow()

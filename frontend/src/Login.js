@@ -8,7 +8,6 @@ const AuthPage = () => {
   const [success, setSuccess] = useState('');
     const navigate = useNavigate();
 
-  // Form data
   const [formData, setFormData] = useState({
     username: '',
     email: '',
@@ -16,7 +15,6 @@ const AuthPage = () => {
     confirmPassword: ''
   });
 
-  // --- ICONS ---
   const FilmIcon = () => (
     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
       <rect width="18" height="18" x="3" y="3" rx="2"></rect>
@@ -78,7 +76,6 @@ const AuthPage = () => {
       ...prev,
       [name]: value
     }));
-    // Clear errors when user starts typing
     if (error) setError('');
   };
 
@@ -143,7 +140,6 @@ const AuthPage = () => {
             navigate('/home');
           }, 1000);
         } else {
-          // Registration successful
           setSuccess('Registrazione completata! Ora puoi effettuare il login.');
           setFormData({ username: '', email: '', password: '', confirmPassword: '' });
           setTimeout(() => {
@@ -281,7 +277,7 @@ const AuthPage = () => {
       outline: 'none',
       transition: 'all 0.3s ease',
       backdropFilter: 'blur(8px)',
-      boxSizing: 'border-box' // FIX: Aggiungiamo box-sizing
+      boxSizing: 'border-box'
     },
     inputFocus: {
       borderColor: '#ef4444',
@@ -316,7 +312,7 @@ const AuthPage = () => {
       boxShadow: '0 4px 16px rgba(239, 68, 68, 0.3)',
       position: 'relative',
       overflow: 'hidden',
-      boxSizing: 'border-box' // FIX: Aggiungiamo anche qui per consistenza
+      boxSizing: 'border-box'
     },
     submitButtonHover: {
       transform: 'translateY(-2px)',
@@ -351,7 +347,7 @@ const AuthPage = () => {
       fontSize: '14px',
       marginBottom: '1rem',
       border: '1px solid',
-      boxSizing: 'border-box' // FIX: Aggiungiamo anche qui
+      boxSizing: 'border-box'
     },
     alertError: {
       backgroundColor: 'rgba(239, 68, 68, 0.1)',
@@ -376,7 +372,6 @@ const AuthPage = () => {
 
   return (
     <div style={styles.container}>
-      {/* Background Pattern */}
       <div style={{
         position: 'absolute',
         inset: 0,
@@ -388,7 +383,6 @@ const AuthPage = () => {
         `
       }} />
 
-      {/* Back Button */}
       <button 
         style={styles.backButton}
         onClick={goBack}
@@ -404,11 +398,9 @@ const AuthPage = () => {
         <ArrowLeftIcon />
       </button>
 
-      {/* Auth Card */}
       <div style={styles.authCard}>
         <div style={styles.cardAccent} />
         
-        {/* Logo */}
         <div style={styles.logoContainer}>
           <div style={styles.logoIcon}>
             <FilmIcon />
@@ -416,7 +408,6 @@ const AuthPage = () => {
           <span style={styles.logoText}>FilmFinder</span>
         </div>
 
-        {/* Title */}
         <h1 style={styles.title}>
           {isLogin ? 'Bentornato!' : 'Unisciti a noi'}
         </h1>
@@ -427,7 +418,6 @@ const AuthPage = () => {
           }
         </p>
 
-        {/* Alerts */}
         {error && (
           <div style={{...styles.alert, ...styles.alertError}}>
             {error}
@@ -439,7 +429,6 @@ const AuthPage = () => {
           </div>
         )}
 
-        {/* Form */}
         <div style={styles.form}>
           {!isLogin && (
             <div style={styles.inputGroup}>
@@ -569,7 +558,6 @@ const AuthPage = () => {
           </button>
         </div>
 
-        {/* Toggle */}
         <div style={styles.toggleContainer}>
           <span style={styles.toggleText}>
             {isLogin ? 'Non hai un account?' : 'Hai già un account?'}

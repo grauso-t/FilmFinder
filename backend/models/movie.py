@@ -1,4 +1,3 @@
-# models/movie.py
 from marshmallow import Schema, fields, validate, post_load
 from datetime import datetime
 from typing import Optional, List, Dict, Any

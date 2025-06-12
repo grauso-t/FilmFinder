@@ -13,7 +13,6 @@ const FilmFinder = () => {
     navigate(`/film/${filmId}`);
   };
 
-  // --- ICONS ---
   const SearchIcon = () => (
     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
       <circle cx="11" cy="11" r="8"></circle>
@@ -64,14 +63,13 @@ const FilmFinder = () => {
     </svg>
   );
 
-  // Icone per le nuove categorie
-  const HeartIcon = () => ( // Romance
+  const HeartIcon = () => (
     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
       <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
     </svg>
   );
   
-  const GhostIcon = () => ( // Horror
+  const GhostIcon = () => (
     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
         <path d="M5.5 12.5c0-2.48 2.02-4.5 4.5-4.5s4.5 2.02 4.5 4.5v.5h-9v-.5z"></path>
         <path d="M18 10h.5a2.5 2.5 0 0 1 0 5h-.5v6H6v-6H5.5a2.5 2.5 0 0 1 0-5H6V9a6 6 0 0 1 6-6c2.05 0 3.9.99 5.12 2.55"></path>
@@ -79,7 +77,7 @@ const FilmFinder = () => {
     </svg>
   );
 
-  const SparklesIcon = () => ( // Animation
+  const SparklesIcon = () => (
       <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
         <path d="M9.5 2.5l1.5 3 3.5.5-2.5 2.5.5 3.5-3-1.5-3 1.5.5-3.5-2.5-2.5 3.5-.5zM18 13l-1.5-3-3.5-.5 2.5-2.5-.5-3.5 3 1.5 3-1.5-.5 3.5 2.5 2.5-3.5.5z"></path>
         <path d="m22 18-1-1-1 1-1-1-1 1-1-1-1 1"></path>
@@ -87,14 +85,14 @@ const FilmFinder = () => {
       </svg>
   );
 
-  const HomeIcon = () => ( // Family
+  const HomeIcon = () => (
     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
       <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
       <polyline points="9 22 9 12 15 12 15 22"></polyline>
     </svg>
   );
 
-  const ComedyMaskIcon = () => ( // Comedy
+  const ComedyMaskIcon = () => (
     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
       <path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"></path>
       <path d="M8 14s1.5 2 4 2 4-2 4-2"></path>
@@ -104,14 +102,9 @@ const FilmFinder = () => {
   );
   
   useEffect(() => {
-    // Check if user is logged in
     const userJSON = localStorage.getItem('user');
 
-    if (!userJSON) {
-      // Redirect to login if not logged in
-      navigate('/login');
-    } else {
-      // Parse user data
+    if (userJSON) {
       try {
         setUser(JSON.parse(userJSON));
       } catch (err) {
@@ -122,7 +115,6 @@ const FilmFinder = () => {
     }
   }, [navigate]);
 
-  // Fetch movies from API
   useEffect(() => {
     const fetchMovies = async () => {
       try {
@@ -151,7 +143,6 @@ const FilmFinder = () => {
     fetchMovies();
   }, []);
 
-  // Transform movie data for display
   const transformMovieData = (movie) => ({
     id: movie.id,
     title: movie.title,
@@ -162,7 +153,6 @@ const FilmFinder = () => {
     description: movie.description
   });
 
-  // Filter movies by categories
   const getMoviesByCategory = (category, limit = 10) => {
     if (!movies.length) return [];
     
@@ -593,7 +583,6 @@ const FilmFinder = () => {
     );
   }
 
-  // Get categorized movies
   const topFilms = getMoviesByCategory('top_rated');
   const trendingFilms = getMoviesByCategory('trending');
   const actionFilms = getMoviesByCategory('action');
@@ -606,10 +595,8 @@ const FilmFinder = () => {
 
   return (
     <div style={styles.container}>
-      {/* Header */}
       <header style={styles.header}>
         <div style={styles.headerContent}>
-          {/* Logo */}
           <div style={styles.logoContainer}>
             <div style={styles.logoIcon}>
               <FilmIcon />
@@ -620,7 +607,6 @@ const FilmFinder = () => {
             <span style={styles.logoText}>FilmFinder</span>
           </div>
 
-          {/* Search Bar */}
           <div style={styles.searchContainer}>
             <div style={styles.searchIcon}>
               <SearchIcon />
@@ -634,7 +620,6 @@ const FilmFinder = () => {
             />
           </div>
 
-          {/* User Profile */}
           <button
             style={styles.userButton}
             onClick={() => user ? navigate('/profile') : navigate('/login')}
@@ -644,7 +629,6 @@ const FilmFinder = () => {
         </div>
       </header>
 
-      {/* Hero Section */}
       <div style={styles.heroSection}>
         <div style={styles.heroCard}>
           <h1 style={styles.heroTitle}>
@@ -658,7 +642,6 @@ const FilmFinder = () => {
         </div>
       </div>
 
-      {/* Film Sections */}
       <div style={styles.sectionsContainer}>
         <FilmSection title="Film Top Rated" films={topFilms} icon={AwardIcon} />
         <FilmSection title="Trending Ora" films={trendingFilms} icon={TrendingIcon} />
@@ -671,7 +654,6 @@ const FilmFinder = () => {
         <FilmSection title="Film Drammatici" films={dramaFilms} icon={CalendarIcon} />
       </div>
 
-      {/* Footer */}
       <footer style={styles.footer}>
         <div style={styles.footerLogo}>
           <div style={styles.footerLogoIcon}>
