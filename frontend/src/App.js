@@ -6,6 +6,7 @@ const FilmFinder = () => {
   const [user, setUser] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [movies, setMovies] = useState([]);
+  const [searchResults, setSearchResults] = useState([]); // New state for search results
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -119,7 +120,14 @@ const FilmFinder = () => {
     const fetchMovies = async () => {
       try {
         setLoading(true);
-        const response = await fetch('http://127.0.0.1:5000/api/movies/');
+        setError(null); // Clear previous errors
+
+        let url = 'http://127.0.0.1:5000/api/movies/';
+        if (searchQuery) {
+          url = `http://127.0.0.1:5000/api/movies/search?query=${encodeURIComponent(searchQuery)}`;
+        }
+        
+        const response = await fetch(url);
         
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
@@ -127,10 +135,22 @@ const FilmFinder = () => {
         
         const data = await response.json();
         
-        if (data.success && data.data) {
-          setMovies(data.data);
+        if (searchQuery) {
+          // The search endpoint returns a list of movies directly, not an object with 'success' and 'data'
+          if (Array.isArray(data)) { 
+            setSearchResults(data.map(transformMovieData));
+            setMovies([]); // Clear main movie list when searching
+          } else {
+            throw new Error('Invalid search response format');
+          }
         } else {
-          throw new Error('Invalid response format');
+          // For the main movie list, expect success and data
+          if (data.success && data.data) {
+            setMovies(data.data);
+            setSearchResults([]); // Clear search results when not searching
+          } else {
+            throw new Error('Invalid response format');
+          }
         }
       } catch (err) {
         setError(err.message);
@@ -140,8 +160,12 @@ const FilmFinder = () => {
       }
     };
 
-    fetchMovies();
-  }, []);
+    const debounceSearch = setTimeout(() => {
+      fetchMovies();
+    }, 500); // Debounce search to avoid too many requests
+
+    return () => clearTimeout(debounceSearch); // Cleanup
+  }, [searchQuery]); // Re-run effect when searchQuery changes
 
   const transformMovieData = (movie) => ({
     id: movie.id,
@@ -471,6 +495,13 @@ const FilmFinder = () => {
     },
     footerText: {
         color: '#9ca3af'
+    },
+    // New styles for search results grid
+    searchResultsGrid: {
+      display: 'grid',
+      gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))',
+      gap: '1rem',
+      padding: '1rem',
     }
   };
 
@@ -643,15 +674,39 @@ const FilmFinder = () => {
       </div>
 
       <div style={styles.sectionsContainer}>
-        <FilmSection title="Film Top Rated" films={topFilms} icon={AwardIcon} />
-        <FilmSection title="Trending Ora" films={trendingFilms} icon={TrendingIcon} />
-        <FilmSection title="Film Commedia" films={comedyFilms} icon={ComedyMaskIcon} />
-        <FilmSection title="Film d'Azione" films={actionFilms} icon={FilmIcon} />
-        <FilmSection title="Film d'Amore" films={romanceFilms} icon={HeartIcon} />
-        <FilmSection title="Film Horror" films={horrorFilms} icon={GhostIcon} />
-        <FilmSection title="Film di Animazione" films={animationFilms} icon={SparklesIcon} />
-        <FilmSection title="Film per la Famiglia" films={familyFilms} icon={HomeIcon} />
-        <FilmSection title="Film Drammatici" films={dramaFilms} icon={CalendarIcon} />
+        {searchQuery ? (
+          <div style={{ marginBottom: '3rem' }}>
+            <div style={styles.sectionHeader}>
+              <div style={styles.sectionIcon}>
+                <SearchIcon />
+              </div>
+              <h2 style={styles.sectionTitle}>Risultati di ricerca per "{searchQuery}"</h2>
+            </div>
+            {searchResults.length > 0 ? (
+              <div style={styles.searchResultsGrid}>
+                {searchResults.map((film) => (
+                  <FilmCard key={film.id} film={film} />
+                ))}
+              </div>
+            ) : (
+              <div style={styles.loadingContainer}>
+                Nessun film trovato per la tua ricerca.
+              </div>
+            )}
+          </div>
+        ) : (
+          <>
+            <FilmSection title="Film Top Rated" films={topFilms} icon={AwardIcon} />
+            <FilmSection title="Trending Ora" films={trendingFilms} icon={TrendingIcon} />
+            <FilmSection title="Film Commedia" films={comedyFilms} icon={ComedyMaskIcon} />
+            <FilmSection title="Film d'Azione" films={actionFilms} icon={FilmIcon} />
+            <FilmSection title="Film d'Amore" films={romanceFilms} icon={HeartIcon} />
+            <FilmSection title="Film Horror" films={horrorFilms} icon={GhostIcon} />
+            <FilmSection title="Film di Animazione" films={animationFilms} icon={SparklesIcon} />
+            <FilmSection title="Film per la Famiglia" films={familyFilms} icon={HomeIcon} />
+            <FilmSection title="Film Drammatici" films={dramaFilms} icon={CalendarIcon} />
+          </>
+        )}
       </div>
 
       <footer style={styles.footer}>

@@ -117,6 +117,8 @@ const Profile = () => {
   const [favoriteMovies, setFavoriteMovies] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   useEffect(() => {
     const loggedInUser = localStorage.getItem('user');
@@ -151,6 +153,35 @@ const Profile = () => {
       fetchFavorites();
     }
   }, [user]);
+
+  const handleDeleteAccount = async () => {
+    if (!user || !user.id) return;
+
+    setIsDeleting(true);
+    try {
+      const response = await fetch(`http://127.0.0.1:5000/api/users/${user.id}`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (response.ok) {
+        // Rimuovi i dati utente dal localStorage
+        localStorage.removeItem('user');
+        // Redirect alla home
+        navigate('/home');
+      } else {
+        const errorData = await response.json();
+        setError(errorData.error || 'Errore nell\'eliminazione dell\'account');
+      }
+    } catch (err) {
+      setError('Errore di connessione durante l\'eliminazione dell\'account');
+    } finally {
+      setIsDeleting(false);
+      setShowDeleteConfirm(false);
+    }
+  };
 
   const styles = {
     container: {
@@ -192,6 +223,11 @@ const Profile = () => {
       backgroundClip: 'text',
       letterSpacing: '-0.02em',
     },
+    buttonGroup: {
+      display: 'flex',
+      gap: '1rem',
+      alignItems: 'center',
+    },
     backButton: {
       display: 'flex',
       alignItems: 'center',
@@ -208,6 +244,23 @@ const Profile = () => {
       boxShadow: '0 4px 15px rgba(0, 0, 0, 0.1)',
       backdropFilter: 'blur(10px)',
       border: '1px solid rgba(55, 65, 81, 0.5)',
+    },
+    deleteButton: {
+      display: 'flex',
+      alignItems: 'center',
+      gap: '10px',
+      background: 'linear-gradient(135deg, #dc2626 0%, #b91c1c 100%)',
+      border: 'none',
+      color: '#ffffff',
+      fontSize: '16px',
+      fontWeight: '500',
+      cursor: 'pointer',
+      padding: '12px 20px',
+      borderRadius: '12px',
+      transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+      boxShadow: '0 4px 15px rgba(220, 38, 38, 0.2)',
+      backdropFilter: 'blur(10px)',
+      border: '1px solid rgba(185, 28, 28, 0.5)',
     },
     content: {
       position: 'relative',
@@ -267,6 +320,73 @@ const Profile = () => {
       fontSize: '0.9rem',
       color: '#9ca3af',
       fontWeight: '500',
+    },
+    // Modal styles
+    modalOverlay: {
+      position: 'fixed',
+      top: 0,
+      left: 0,
+      right: 0,
+      bottom: 0,
+      backgroundColor: 'rgba(0, 0, 0, 0.8)',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      zIndex: 1000,
+      backdropFilter: 'blur(5px)',
+    },
+    modal: {
+      background: 'linear-gradient(135deg, #1f2937 0%, #374151 100%)',
+      borderRadius: '20px',
+      padding: '2rem',
+      maxWidth: '500px',
+      width: '90%',
+      border: '1px solid rgba(55, 65, 81, 0.5)',
+      boxShadow: '0 25px 50px rgba(0, 0, 0, 0.5)',
+    },
+    modalTitle: {
+      fontSize: '1.5rem',
+      fontWeight: '700',
+      color: '#ffffff',
+      marginBottom: '1rem',
+      textAlign: 'center',
+    },
+    modalText: {
+      color: '#d1d5db',
+      fontSize: '1rem',
+      lineHeight: '1.6',
+      marginBottom: '2rem',
+      textAlign: 'center',
+    },
+    modalButtons: {
+      display: 'flex',
+      gap: '1rem',
+      justifyContent: 'center',
+    },
+    confirmButton: {
+      background: 'linear-gradient(135deg, #dc2626 0%, #b91c1c 100%)',
+      border: 'none',
+      color: '#ffffff',
+      fontSize: '16px',
+      fontWeight: '600',
+      cursor: 'pointer',
+      padding: '12px 24px',
+      borderRadius: '12px',
+      transition: 'all 0.3s ease',
+      minWidth: '120px',
+      disabled: isDeleting,
+    },
+    cancelButton: {
+      background: 'linear-gradient(135deg, #374151 0%, #4b5563 100%)',
+      border: 'none',
+      color: '#ffffff',
+      fontSize: '16px',
+      fontWeight: '600',
+      cursor: 'pointer',
+      padding: '12px 24px',
+      borderRadius: '12px',
+      transition: 'all 0.3s ease',
+      minWidth: '120px',
     }
   };
 
@@ -307,22 +427,41 @@ const Profile = () => {
       
       <header style={styles.header}>
         {user && <h1 style={styles.title}>Preferiti di {user.username}</h1>}
-        <button 
-          style={styles.backButton}
-          onClick={() => navigate('/home')}
-          onMouseEnter={(e) => {
-            e.target.style.transform = 'translateY(-2px)';
-            e.target.style.boxShadow = '0 8px 25px rgba(0, 0, 0, 0.2)';
-            e.target.style.background = 'linear-gradient(135deg, #4b5563 0%, #6b7280 100%)';
-          }}
-          onMouseLeave={(e) => {
-            e.target.style.transform = 'translateY(0)';
-            e.target.style.boxShadow = '0 4px 15px rgba(0, 0, 0, 0.1)';
-            e.target.style.background = 'linear-gradient(135deg, #374151 0%, #4b5563 100%)';
-          }}
-        >
-          ← Torna alla Home
-        </button>
+        <div style={styles.buttonGroup}>
+          <button 
+            style={styles.backButton}
+            onClick={() => navigate('/home')}
+            onMouseEnter={(e) => {
+              e.target.style.transform = 'translateY(-2px)';
+              e.target.style.boxShadow = '0 8px 25px rgba(0, 0, 0, 0.2)';
+              e.target.style.background = 'linear-gradient(135deg, #4b5563 0%, #6b7280 100%)';
+            }}
+            onMouseLeave={(e) => {
+              e.target.style.transform = 'translateY(0)';
+              e.target.style.boxShadow = '0 4px 15px rgba(0, 0, 0, 0.1)';
+              e.target.style.background = 'linear-gradient(135deg, #374151 0%, #4b5563 100%)';
+            }}
+          >
+            ← Torna alla Home
+          </button>
+          
+          <button 
+            style={styles.deleteButton}
+            onClick={() => setShowDeleteConfirm(true)}
+            onMouseEnter={(e) => {
+              e.target.style.transform = 'translateY(-2px)';
+              e.target.style.boxShadow = '0 8px 25px rgba(220, 38, 38, 0.4)';
+              e.target.style.background = 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)';
+            }}
+            onMouseLeave={(e) => {
+              e.target.style.transform = 'translateY(0)';
+              e.target.style.boxShadow = '0 4px 15px rgba(220, 38, 38, 0.2)';
+              e.target.style.background = 'linear-gradient(135deg, #dc2626 0%, #b91c1c 100%)';
+            }}
+          >
+            🗑️ Elimina Account
+          </button>
+        </div>
       </header>
 
       <div style={styles.content}>
@@ -352,6 +491,62 @@ const Profile = () => {
           </div>
         )}
       </div>
+
+      {/* Modal di conferma eliminazione */}
+      {showDeleteConfirm && (
+        <div style={styles.modalOverlay} onClick={() => setShowDeleteConfirm(false)}>
+          <div style={styles.modal} onClick={(e) => e.stopPropagation()}>
+            <h3 style={styles.modalTitle}>⚠️ Conferma Eliminazione</h3>
+            <p style={styles.modalText}>
+              Sei sicuro di voler eliminare il tuo account? 
+              <br /><br />
+              <strong>Questa azione è irreversibile</strong> e comporterà la perdita permanente di:
+              <br />• Tutti i tuoi film preferiti
+              <br />• Il tuo profilo utente
+              <br />• Tutti i dati associati al tuo account
+            </p>
+            <div style={styles.modalButtons}>
+              <button 
+                style={styles.cancelButton}
+                onClick={() => setShowDeleteConfirm(false)}
+                onMouseEnter={(e) => {
+                  e.target.style.background = 'linear-gradient(135deg, #4b5563 0%, #6b7280 100%)';
+                  e.target.style.transform = 'translateY(-1px)';
+                }}
+                onMouseLeave={(e) => {
+                  e.target.style.background = 'linear-gradient(135deg, #374151 0%, #4b5563 100%)';
+                  e.target.style.transform = 'translateY(0)';
+                }}
+              >
+                Annulla
+              </button>
+              <button 
+                style={{
+                  ...styles.confirmButton,
+                  opacity: isDeleting ? 0.7 : 1,
+                  cursor: isDeleting ? 'not-allowed' : 'pointer'
+                }}
+                onClick={handleDeleteAccount}
+                disabled={isDeleting}
+                onMouseEnter={(e) => {
+                  if (!isDeleting) {
+                    e.target.style.background = 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)';
+                    e.target.style.transform = 'translateY(-1px)';
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  if (!isDeleting) {
+                    e.target.style.background = 'linear-gradient(135deg, #dc2626 0%, #b91c1c 100%)';
+                    e.target.style.transform = 'translateY(0)';
+                  }
+                }}
+              >
+                {isDeleting ? 'Eliminazione...' : 'Elimina Account'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

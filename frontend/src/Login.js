@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 const AuthPage = () => {
@@ -6,7 +6,7 @@ const AuthPage = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
-    const navigate = useNavigate();
+  const navigate = useNavigate();
 
   const [formData, setFormData] = useState({
     username: '',
@@ -162,6 +162,13 @@ const AuthPage = () => {
   const goBack = () => {
     navigate('/home');
   };
+
+  useEffect(() => {
+    const loggedInUser = localStorage.getItem('user');
+    if (loggedInUser) {
+      navigate('/home');
+    }
+  }, [navigate]);
 
   const styles = {
     container: {
