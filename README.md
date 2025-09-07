@@ -62,9 +62,3 @@ _Pagina di dettaglio di un film_
 
 ![Cast](https://github.com/grauso-t/FilmFinder/blob/main/docs/cast.png)
 _Informazioni sul cast di un titolo_
-
----
-
-## Progetto Accademico
-
-Questo lavoro è stato realizzato nell'ambito del corso di **Basi di Dati II** presso l'**Università degli Studi di Salerno**.
